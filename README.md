@@ -48,5 +48,84 @@ Following the original Alpaca format, our Long QA data uses the following prompt
 - `output`: `str`, the answer to the instruction.
 We did not use the `input` format in the Alpaca format for simplicity.
 
+## Models 
+### Models with supervised fine-tuning
+| Model          | Size | Context | Train   | Link                                                       |
+|:---------------|------|---------|---------|------------------------------------------------------------|
+| 3D-RPE-LLaMA2-7B-Chat-HF  | 7B   | 16384   | Full FT | [Model](https://huggingface.co/xindian/3D-RPE-LLaMA2-7B-Chat-hf)
 
+## Training
+### Pre-trained weights
+We use LLaMA2 models as the pre-trained weights and fine-tune them to long context window sizes. Download based on your choices.
+
+| Pre-trained weights                                                        |
+|:---------------------------------------------------------------------------|
+| [Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) |
+| [Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf) |
+
+### Fine-tuning
+'''
+torchrun  fine-tune-cpe-chat2.py  \
+        --model_name_or_path ./models/llama-2-7b-chat-hf \
+        --bf16 True \
+        --output_dir ./models/cpe-llama2-7b-chat-hf \
+        --max_steps 3100    \
+        --per_device_train_batch_size 1 \
+        --per_device_eval_batch_size 1  \
+        --gradient_accumulation_steps 2 \
+        --evaluation_strategy no \
+        --save_strategy steps \
+        --save_steps 1000  \
+        --save_total_limit 2 \
+        --learning_rate 2e-5 \
+        --weight_decay 0.  \
+        --warmup_ratio 0.03  \
+        --lr_scheduler_type "cosine" \
+        --logging_steps 1  \
+        --fsdp "full_shard auto_wrap" \
+        --fsdp_transformer_layer_cls_to_wrap 'LlamaDecoderLayer' \
+        --tf32 True  \
+        --model_max_length 16384  \
+        --gradient_checkpointing True  \
+        --pretraining_length 4096 \
+        --lazy_preprocess False
+
+'''
+- There is no need to make supervised fine-tuning upon the fine-tuned context extended models. It is all right to directly use base model as Llama2-chat models, as the amount of long instruction following data is enough for SFT.
+- Our long instruction following data can be found in [LongAlpaca-12k.json](https://huggingface.co/datasets/Yukang/LongAlpaca-12k).
+  
+### Get trainable weights in low-rank training
+In low-rank training, we set embedding and normalization layers as trainable. Please use the following line to extract the trainable weights `trainable_params.bin` from `pytorch_model.bin`
+```
+python3 get_trainable_weights.py --checkpoint_path path_to_saving_checkpoints --trainable_params "embed,norm"
+```
+
+### Merge LoRA Weight
+Merge the LoRA weights of `pytorch_model.bin` and trainable parameters `trainable_params.bin`, save the resulting model into your desired path in the Hugging Face format:
+```
+python3 merge_lora_weights_and_save_hf_model.py \
+        --base_model ./model/Llama-2-7b-hf \
+        --peft_model path_to_saving_checkpoints \
+        --context_size 8192 \
+        --save_path path_to_saving_merged_model
+```
+
+## Evaluation 
+```
+python longbench-eval.py
+
+## Citation
+If you find this project useful in your research, please consider citing:
+This paper have been accepted by the conference AAAI-2025.
+```
+@misc{ma20243drpeenhancinglongcontextmodeling,
+      title={3D-RPE: Enhancing Long-Context Modeling Through 3D Rotary Position Encoding}, 
+      author={Xindian Ma and Wenyuan Liu and Peng Zhang and Nan Xu},
+      year={2024},
+      eprint={2406.09897},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2406.09897}, 
+}
+```
 
