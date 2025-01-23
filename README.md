@@ -113,11 +113,12 @@ python3 merge_lora_weights_and_save_hf_model.py \
 ## Evaluation 
 ```
 python longbench-eval.py
-
+'''
 ## Citation
 If you find this project useful in your research, please consider citing:
 This paper have been accepted by the conference AAAI-2025.
-```
+
+'''
 @misc{ma20243drpeenhancinglongcontextmodeling,
       title={3D-RPE: Enhancing Long-Context Modeling Through 3D Rotary Position Encoding}, 
       author={Xindian Ma and Wenyuan Liu and Peng Zhang and Nan Xu},
