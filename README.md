@@ -28,11 +28,9 @@ To download and use the [pre-trained weights](#pre-trained-weights) you will nee
 
 ## Installation and Quick Guide
 To install and run the application:
-1. [Fork this repo](## Installation and Quick Guide
-To install and run the application:
-2. [Fork this repo](https://github.com/maxindian/3D-RPE-Long-Contex-Modeling) on github
-3. Clone the repository on your local machine, using git clone and pasting the url of this project.
-4. Run the following code:
+1. [Fork this repo](https://github.com/maxindian/3D-RPE-Long-Contex-Modeling) on github
+2. Clone the repository on your local machine, using git clone and pasting the url of this project.
+3. Run the following code:
 ```
 pip install -r requirements.txt
 pip install flash-attn --no-build-isolation
@@ -41,11 +39,6 @@ pip install flash-attn --no-build-isolation
 
 LongAlpaca-12k contains 9k long QA data that we collected and 3k short QA sampled from the original [Alpaca data](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json). This is to avoid the case that the model might degrade at short instruction following. The data we collect contains various types and amounts as the following figure.
 
-<p align="center" width="100%">
-<img src="imgs/data-distribution-in-longalpaca12k.png" alt="Stanford-Alpaca" style="width: 60%; min-width: 300px; display: block; margin: auto;">
-</p>
-
-
 | Data           | Short QA | Long QA  | Total    | Download |
 |:---------------|----------|----------|----------|----------|
 | LongAlpaca-12k | 3k       | 9k       | 12k      | [Link](https://huggingface.co/datasets/Yukang/LongAlpaca-12k) |
@@ -53,7 +46,6 @@ LongAlpaca-12k contains 9k long QA data that we collected and 3k short QA sample
 Following the original Alpaca format, our Long QA data uses the following prompts for fine-tuning:
 - `instruction`: `str`, describes the task the model should perform. For example, to answer a question after reading a book section or paper. We vary the contents and questions to make instructions diverse.
 - `output`: `str`, the answer to the instruction.
-
 We did not use the `input` format in the Alpaca format for simplicity.
 
 
